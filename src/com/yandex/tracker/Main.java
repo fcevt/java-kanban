@@ -1,3 +1,7 @@
+package com.yandex.tracker;
+import com.yandex.tracker.model.*;
+import com.yandex.tracker.servise.TaskManager;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -26,22 +30,25 @@ public class Main {
         System.out.println();
         System.out.println("Меняю статус");
         System.out.println();
-        taskManager.updateTaskStatus(task.getId(), TaskStatus.DONE);
-        taskManager.updateSubtaskStatus(subtask4.getId(), TaskStatus.DONE);
-        taskManager.updateSubtaskStatus(subtask3.getId(), TaskStatus.DONE);
+        task.setStatus(TaskStatus.IN_PROGRESS);
+        taskManager.updateTask(task);
+        subtask.setStatus(TaskStatus.IN_PROGRESS);
+        taskManager.updateSubtask(subtask);
+        subtask4.setStatus(TaskStatus.DONE);
+        taskManager.updateSubtask(subtask4);
         System.out.println(taskManager.getListOfTasks());
         System.out.println(taskManager.getListOfEpics());
         System.out.println(taskManager.getListOfSubtasks());
         System.out.println();
-        System.out.println("Удаляю задачу и эпик");
+        System.out.println("Удаляю задачу и подзадачу");
         System.out.println();
-        taskManager.deleteEpicById(epic1.getId());
+        taskManager.deleteSubtaskById(subtask4.getId());
         taskManager.deleteTaskById(task1.getId());
         System.out.println(taskManager.getListOfTasks());
         System.out.println(taskManager.getListOfEpics());
         System.out.println(taskManager.getListOfSubtasks());
-        System.out.println("Удаляю все");
-        taskManager.removeAll();
+        System.out.println("Удаляю эпики");
+        taskManager.removeEpics();
         System.out.println(taskManager.getListOfTasks());
         System.out.println(taskManager.getListOfEpics());
         System.out.println(taskManager.getListOfSubtasks());
