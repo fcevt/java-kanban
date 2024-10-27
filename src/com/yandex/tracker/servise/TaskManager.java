@@ -31,10 +31,9 @@ public class TaskManager {
     // получение списка подзадач определенного эпика
     public ArrayList<Subtask> getListOfEpicSubtask(int epicId) {
         ArrayList<Subtask> listOfSubtask = new ArrayList<>();
-        for (Subtask subtask : subtasks.values()) {
-            if (subtask.getEpicId() == epicId) {
-                listOfSubtask.add(subtask);
-            }
+        Epic epic = epics.get(epicId);
+        for (Integer subtaskId : epic.getListOfSubtasks()) {
+            listOfSubtask.add(subtasks.get(subtaskId));
         }
         return listOfSubtask;
     }
@@ -94,6 +93,7 @@ public class TaskManager {
         Epic epic = epics.get(epicId);
         epic.addSubtaskToList(subtask.getId());
         updateEpic(epic);
+        updateEpicStatus(epic.getId());
         return subtask;
     }
 
@@ -118,11 +118,9 @@ public class TaskManager {
     }
 
     public void  deleteEpicById(int id) {
-        epics.remove(id);
-        for (Subtask subtask : subtasks.values()) {
-            if (subtask.getEpicId() == id) {
-                subtasks.remove(subtask.getId());
-            }
+        final Epic epic = epics.remove(id);
+        for (Integer subtaskId : epic.getListOfSubtasks()) {
+            subtasks.remove(subtaskId);
         }
     }
 

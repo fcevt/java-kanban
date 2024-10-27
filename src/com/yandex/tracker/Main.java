@@ -40,6 +40,21 @@ public class Main {
         System.out.println(taskManager.getListOfEpics());
         System.out.println(taskManager.getListOfSubtasks());
         System.out.println();
+        System.out.println("Создаю новую подзадачу");
+        Subtask subtask5 = taskManager.createSubtask(new Subtask("Найти и купить учебники по английскому",
+                "Купить учебники"), epic1.getId());
+        System.out.println();
+        System.out.println(taskManager.getListOfTasks());
+        System.out.println(taskManager.getListOfEpics());
+        System.out.println(taskManager.getListOfSubtasks());
+        System.out.println();
+        System.out.println("Удаляю эпик");
+        taskManager.deleteEpicById(epic.getId());
+        System.out.println();
+        System.out.println(taskManager.getListOfTasks());
+        System.out.println(taskManager.getListOfEpics());
+        System.out.println(taskManager.getListOfSubtasks());
+        System.out.println();
         System.out.println("Удаляю задачу и подзадачу");
         System.out.println();
         taskManager.deleteSubtaskById(subtask4.getId());
