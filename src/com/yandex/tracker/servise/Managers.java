@@ -2,6 +2,9 @@ package com.yandex.tracker.servise;
 
 public class Managers {
 
+    private Managers() {
+    }
+
     public static TaskManager getDefault() {
         return new InMemoryTaskManager();
     }

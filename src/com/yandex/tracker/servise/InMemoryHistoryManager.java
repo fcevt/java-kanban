@@ -2,26 +2,29 @@ package com.yandex.tracker.servise;
 
 import com.yandex.tracker.model.Task;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
+    private static final int MAX_BROWSING_HISTORY_SIZE = 10;
     private final List<Task> browsingHistory;
 
-    InMemoryHistoryManager() {
-        browsingHistory = new ArrayList<>();
+    public InMemoryHistoryManager() {
+        browsingHistory = new LinkedList<>();
     }
     @Override
     public List<Task> getHistory() {
-        return browsingHistory;
+        return List.copyOf(browsingHistory);
     }
     @Override
     public void add(Task task) {
-        if (browsingHistory.size() == 10) {
-            browsingHistory.removeFirst();
+        if (task != null) {
+            if (browsingHistory.size() == MAX_BROWSING_HISTORY_SIZE) {
+                browsingHistory.removeFirst();
+            }
+            browsingHistory.add(task);
         }
-        browsingHistory.add(task);
     }
 
 }

@@ -49,9 +49,9 @@ public class Main {
         taskManager.getTaskById(1);
         taskManager.getEpicById(3);
         taskManager.getSubtasksById(5);
-        taskManager.getTaskById(2);
-        taskManager.getEpicById(4);
-        taskManager.getSubtasksById(6);
+        taskManager.getTaskById(0);
+        taskManager.getEpicById(0);
+        taskManager.getSubtasksById(0);
         System.out.println();
         printAllTasks(taskManager);
         System.out.println();
