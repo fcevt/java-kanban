@@ -37,7 +37,8 @@ class InMemoryTaskManagerTest {
         Assertions.assertNotNull(taskManager.getListOfSubtasks());
         Assertions.assertEquals(subtask, taskManager.getSubtasksById(subtask.getId()));
     }
-//тест, в котором проверяется неизменность задачи (по всем полям) при добавлении задачи в менеджер
+
+   //тест, в котором проверяется неизменность задачи (по всем полям) при добавлении задачи в менеджер
     @Test
     void immutabilityOfTheTaskWhenAddedToManager() {
         Task task = taskManager.createTask(new Task("a", "a"));
@@ -46,5 +47,14 @@ class InMemoryTaskManagerTest {
         Assertions.assertEquals(task.getDescription(),task1.getDescription());
         Assertions.assertEquals(task.getName(), task1.getName());
         Assertions.assertEquals(task.getStatus(), task1.getStatus());
+    }
+
+    //тест на то что из эпика удаляются id удаленных подзадач
+    @Test
+    void thereAreNoDeletedSubtasksInEpicTest() {
+        Epic epic = taskManager.createEpic(new Epic("a","a"));
+        Subtask subtask = taskManager.createSubtask(new Subtask("b", "B"), epic.getId());
+        taskManager.deleteSubtaskById(subtask.getId());
+        Assertions.assertEquals(0, epic.getListOfSubtasks().size());
     }
 }
