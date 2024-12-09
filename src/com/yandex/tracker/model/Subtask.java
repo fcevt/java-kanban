@@ -1,6 +1,6 @@
 package com.yandex.tracker.model;
 
-public class Subtask extends Task{
+public class Subtask extends Task {
     private int epicId;
 
 
