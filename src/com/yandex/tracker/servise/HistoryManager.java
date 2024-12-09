@@ -1,6 +1,5 @@
 package com.yandex.tracker.servise;
 
-import com.yandex.tracker.model.Node;
 import com.yandex.tracker.model.Task;
 
 import java.util.List;

@@ -44,7 +44,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     List<Task> getTasks() {
         List<Task> browsingHistory = new ArrayList<>();
         Node  node = head;
-        while (node != null){
+        while (node != null) {
             browsingHistory.add(node.getData());
             node = node.getNext();
         }
