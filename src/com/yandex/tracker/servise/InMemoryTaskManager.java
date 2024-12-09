@@ -35,6 +35,7 @@ public class InMemoryTaskManager implements TaskManager {
     public ArrayList<Subtask> getListOfSubtasks() {
         return new ArrayList<>(this.subtasks.values());
     }
+
     // получение списка подзадач определенного эпика
     @Override
     public ArrayList<Subtask> getListOfEpicSubtask(int epicId) {
@@ -54,12 +55,18 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeEpics() {
+        for (Integer id : epics.keySet()) {
+            browsingHistory.removeNode(id);
+        }
+        removeSubtasks();
         epics.clear();
-        subtasks.clear();
     }
 
     @Override
     public void removeSubtasks() {
+        for (Integer id : subtasks.keySet()) {
+            browsingHistory.removeNode(id);
+        }
         subtasks.clear();
         for (Epic epic : epics.values()) {
             epic.removeListOfSubtasks();
@@ -139,13 +146,16 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void  deleteTaskById(int id) {
         tasks.remove(id);
+        browsingHistory.removeNode(id);
     }
 
     @Override
     public void  deleteEpicById(int id) {
         final Epic epic = epics.remove(id);
+        browsingHistory.removeNode(id);
         for (Integer subtaskId : epic.getListOfSubtasks()) {
             subtasks.remove(subtaskId);
+            browsingHistory.removeNode(subtaskId);
         }
     }
 
@@ -153,13 +163,13 @@ public class InMemoryTaskManager implements TaskManager {
     public void  deleteSubtaskById(int id) {
         Subtask subtask = subtasks.get(id);
         subtasks.remove(id);
+        browsingHistory.removeNode(id);
         Epic epic = epics.get(subtask.getEpicId());
         epic.removeSubtaskFromList(id);
         updateEpicStatus(subtask.getEpicId());
     }
 
     //обновление статуса
-
     @Override
     public void updateEpicStatus(int epicId, TaskStatus newStatus) {
         Epic epic = epics.get(epicId);
@@ -190,7 +200,6 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             updateEpicStatus(epicId, TaskStatus.IN_PROGRESS);
         }
-
     }
 
     //получение истории просмотров
@@ -198,5 +207,4 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getHistory() {
         return browsingHistory.getHistory();
     }
-
 }

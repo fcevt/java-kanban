@@ -22,56 +22,41 @@ public class Main {
                 epic.getId());
         Subtask subtask3 = taskManager.createSubtask(new Subtask("вскопать огород",
                         "Посадить картошку"), epic.getId());
-        Subtask subtask4 = taskManager.createSubtask(new Subtask("изучить отзывы и цены на репетиторов",
-                        "Найти репетитора"), epic1.getId());
 
         printAllTasks(taskManager);
-        taskManager.getTaskById(1);
-        taskManager.getEpicById(3);
-        taskManager.getSubtasksById(5);
         System.out.println();
-        System.out.println("Меняю статус");
-        System.out.println();
-        task.setStatus(TaskStatus.IN_PROGRESS);
-        taskManager.updateTask(task);
-        subtask.setStatus(TaskStatus.IN_PROGRESS);
-        taskManager.updateSubtask(subtask);
-        subtask4.setStatus(TaskStatus.DONE);
-        taskManager.updateSubtask(subtask4);
+        System.out.println("вызываю все созданные задачи");
+        taskManager.getTaskById(task.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getEpicById(epic.getId());
+        taskManager.getEpicById(epic1.getId());
+        taskManager.getSubtasksById(subtask.getId());
+        taskManager.getSubtasksById(subtask2.getId());
+        taskManager.getSubtasksById(subtask3.getId());
         printAllTasks(taskManager);
         System.out.println();
-        System.out.println("Создаю новую подзадачу");
-        Subtask subtask5 = taskManager.createSubtask(new Subtask("Найти и купить учебники по английскому",
-                "Купить учебники"), epic1.getId());
-        taskManager.getTaskById(1);
-        taskManager.getEpicById(3);
-        taskManager.getSubtasksById(5);
-        taskManager.getTaskById(1);
-        taskManager.getEpicById(3);
-        taskManager.getSubtasksById(5);
-        taskManager.getTaskById(0);
-        taskManager.getEpicById(0);
-        taskManager.getSubtasksById(0);
-        System.out.println();
+        System.out.println("повторно обращаюсь к задачам");
+        taskManager.getTaskById(task1.getId());
+        taskManager.getEpicById(epic1.getId());
+        taskManager.getSubtasksById(subtask.getId());
         printAllTasks(taskManager);
         System.out.println();
-        System.out.println("Удаляю эпик");
+        System.out.println("Удаляю эпик с подзадачами");
         taskManager.deleteEpicById(epic.getId());
         System.out.println();
         printAllTasks(taskManager);
         System.out.println();
-        System.out.println("Удаляю задачу и подзадачу");
+        System.out.println("Удаляю задачу");
         System.out.println();
-        taskManager.deleteSubtaskById(subtask4.getId());
-        taskManager.deleteTaskById(task1.getId());
+        taskManager.deleteTaskById(task.getId());
         System.out.println();
         printAllTasks(taskManager);
-        System.out.println("Удаляю эпики");
+        System.out.println("Удаляю эпики и обращаюсь к несуществующим задачам");
         System.out.println();
         taskManager.removeEpics();
         taskManager.getTaskById(2);
-        taskManager.getEpicById(4);
-        taskManager.getSubtasksById(6);
+        taskManager.getTaskById(1);
+        taskManager.getSubtasksById(1);
         printAllTasks(taskManager);
     }
 
@@ -97,5 +82,6 @@ public class Main {
         for (Task task : manager.getHistory()) {
             System.out.println(task);
         }
+
     }
 }
