@@ -2,7 +2,7 @@ package com.yandex.tracker.model;
 import java.util.ArrayList;
 
 public class Epic extends Task {
-    private ArrayList<Integer> listOfSubtasks;
+    private final ArrayList<Integer> listOfSubtasks;
 
     public Epic(String description, String name) {
         super(description, name);
@@ -32,7 +32,7 @@ public class Epic extends Task {
                 ", description='" + getDescription().length() + '\'' +
                 ", id=" + getId() +
                 ", status=" + getStatus() +
-                ", listOfSubtsks=" + listOfSubtasks +
+                ", listOfSubtasks=" + listOfSubtasks +
                 '}';
     }
 }
