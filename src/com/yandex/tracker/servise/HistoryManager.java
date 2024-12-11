@@ -8,7 +8,7 @@ public interface HistoryManager  {
 
     List<Task> getHistory();
 
-    void removeNode(int id);
+    void remove(int id);
 
     void add(Task task);
 

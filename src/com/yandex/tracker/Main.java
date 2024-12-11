@@ -54,9 +54,9 @@ public class Main {
         System.out.println("Удаляю эпики и обращаюсь к несуществующим задачам");
         System.out.println();
         taskManager.removeEpics();
-        taskManager.getTaskById(2);
         taskManager.getTaskById(1);
         taskManager.getSubtasksById(1);
+        taskManager.getTaskById(task1.getId());
         printAllTasks(taskManager);
     }
 

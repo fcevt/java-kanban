@@ -11,33 +11,23 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private Node head;
     private Node tail;
-    public int size;
-    private Map<Integer, Node> mapForDelete;
+    private final Map<Integer, Node> mapForDelete;
 
 
     public InMemoryHistoryManager() {
-        head = null;
-        tail = null;
-        size = 0;
         mapForDelete = new HashMap<>();
     }
 
     //добавление просмотренных тасков в конец истории просмотров
     Node linkLast(Task task) {
-        if (tail == null) {
-            Node node = new Node(task, null, null);
+        Node node = new Node(task, tail, null);
+        if (head == null) {
             head = node;
-            tail = node;
-            size++;
-            return node;
         } else {
-            Node oldTail = tail;
-            Node newTail = new Node(task, oldTail, null);
-            oldTail.setNext(newTail);
-            tail = newTail;
-            size++;
-            return newTail;
+            tail.setNext(node);
         }
+        tail = node;
+        return node;
     }
 
     //перекладывание истории из связного списка в ArrayList
@@ -56,34 +46,34 @@ public class InMemoryHistoryManager implements HistoryManager {
         return getTasks();
     }
 
-    //удаление ноды в зависимости от ее положения вв списке
     @Override
-    public void removeNode(int id) {
+    public void remove(int id) {
         if (!mapForDelete.containsKey(id)) {
             return;
         }
-        if (size == 1) {
+        removeNode(mapForDelete.get(id));
+        mapForDelete.remove(id);
+    }
+
+    //удаление ноды в зависимости от ее положения вв списке
+    private void removeNode(Node node) {
+        if (node == null) {
+            return;
+        }
+        if (tail == node && head == node) {
             head = null;
             tail = null;
-            mapForDelete.remove(id);
-            size--;
-        } else if (mapForDelete.get(id) == tail) {
-            tail = mapForDelete.get(id).getPrev();
+        } else if (node == tail) {
+            tail = node.getPrev();
             tail.setNext(null);
-            mapForDelete.remove(id);
-            size--;
-        } else if (mapForDelete.get(id) == head) {
-            head = mapForDelete.get(id).getNext();
+        } else if (node == head) {
+            head = node.getNext();
             head.setPrev(null);
-            mapForDelete.remove(id);
-            size--;
         } else {
-            Node prevNode = mapForDelete.get(id).getPrev();
-            Node nextNode = mapForDelete.get(id).getNext();
+            Node prevNode = node.getPrev();
+            Node nextNode = node.getNext();
             prevNode.setNext(nextNode);
             nextNode.setPrev(prevNode);
-            mapForDelete.remove(id);
-            size--;
         }
     }
 
@@ -94,11 +84,8 @@ public class InMemoryHistoryManager implements HistoryManager {
             return;
         }
         if (mapForDelete.containsKey(task.getId())) {
-            removeNode(task.getId());
-            mapForDelete.put(task.getId(), linkLast(task));
-        } else {
-            mapForDelete.put(task.getId(), linkLast(task));
+            removeNode(mapForDelete.remove(task.getId()));
         }
+        mapForDelete.put(task.getId(), linkLast(task));
     }
-
 }
