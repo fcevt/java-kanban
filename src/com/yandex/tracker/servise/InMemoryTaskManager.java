@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static int id;
+    private int id;
     private final HashMap<Integer, Task> tasks;
     private final HashMap<Integer, Epic> epics;
     private final HashMap<Integer, Subtask> subtasks;
@@ -18,6 +18,32 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks = new HashMap<>();
         browsingHistory = Managers.getDefaultHistory();
 
+    }
+
+    public InMemoryTaskManager(int id, HashMap<Integer, Task> tasks, HashMap<Integer, Epic> epics,
+                               HashMap<Integer, Subtask> subtasks) {
+        this.id = id;
+        this.tasks = new HashMap<>(tasks);
+        this.epics = new HashMap<>(epics);
+        this.subtasks = new HashMap<>(subtasks);
+        browsingHistory = Managers.getDefaultHistory();
+
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public HashMap<Integer, Task> getTasks() {
+        return tasks;
+    }
+
+    public HashMap<Integer, Epic> getEpics() {
+        return epics;
+    }
+
+    public HashMap<Integer, Subtask> getSubtasks() {
+        return subtasks;
     }
 
     // получение списков задач

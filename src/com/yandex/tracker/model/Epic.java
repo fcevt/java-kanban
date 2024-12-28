@@ -9,6 +9,11 @@ public class Epic extends Task {
         listOfSubtasks = new ArrayList<>();
     }
 
+    public Epic(int id, String name, String description, TaskStatus status, ArrayList<Integer> listOfSubtasks) {
+        super(id, name, description, status);
+        this.listOfSubtasks = listOfSubtasks;
+    }
+
     public void removeListOfSubtasks() {
         listOfSubtasks.clear();
     }
@@ -23,6 +28,24 @@ public class Epic extends Task {
 
     public ArrayList<Integer> getListOfSubtasks() {
         return listOfSubtasks;
+    }
+
+    private String listOfSubtasksToString() {
+        if (listOfSubtasks.isEmpty()) {
+            return "-1";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Integer id : listOfSubtasks) {
+            sb.append(id);
+            sb.append(" ");
+        }
+        return sb.toString().trim();
+    }
+
+    @Override
+    public String toStringToSave() {
+        return String.format("%d,%s,%s,%s,%s,%s", getId(), TaskType.EPIC, getName(), getDescription(), getStatus(),
+                listOfSubtasksToString());
     }
 
     @Override
