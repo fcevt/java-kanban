@@ -3,10 +3,13 @@ import com.yandex.tracker.model.*;
 import com.yandex.tracker.servise.FileBackedTaskManager;
 import com.yandex.tracker.servise.TaskManager;
 
+import java.io.File;
+
 public class Main {
 
     public static void main(String[] args) {
-        FileBackedTaskManager taskManager = new FileBackedTaskManager();
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(new File(System.getProperty("user.dir"),
+                "testFile.txt"));
         System.out.println("Поехали!");
         System.out.println("Создаю задачи");
         System.out.println();
@@ -29,63 +32,49 @@ public class Main {
         System.out.println("содержание восстановленного из файла менеджера");
         printAllTasks(taskManager1);
         System.out.println();
-        System.out.println("менеджеры равны?");
-        System.out.println(taskManager.equals(taskManager1));
-        System.out.println();
         System.out.println("меняю статус подзадачи");
         System.out.println();
-        taskManager.updateSubtask(new Subtask(5, "замочить семена", "Посадить помидоры",
+        taskManager1.updateSubtask(new Subtask(5, "замочить семена", "Посадить помидоры",
                 TaskStatus.DONE, 3));
         System.out.println("содержание менеджера");
-        printAllTasks(taskManager);
-        System.out.println();
-        System.out.println("содержание восстановленного из файла менеджера");
-        taskManager1 = FileBackedTaskManager.loadFromFile(taskManager.getFile());
         printAllTasks(taskManager1);
         System.out.println();
-        System.out.println("менеджеры равны?");
-        System.out.println(taskManager.equals(taskManager1));
+        System.out.println("содержание восстановленного из файла менеджера");
+        FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(taskManager.getFile());
+        printAllTasks(taskManager2);
         System.out.println();
         System.out.println("Удаляю эпик с подзадачами");
-        taskManager.deleteEpicById(epic.getId());
+        taskManager2.deleteEpicById(epic.getId());
         System.out.println();
         System.out.println("содержание менеджера");
-        printAllTasks(taskManager);
+        printAllTasks(taskManager2);
         System.out.println();
         System.out.println("содержание восстановленного из файла менеджера");
-        taskManager1 = FileBackedTaskManager.loadFromFile(taskManager.getFile());
-        printAllTasks(taskManager1);
-        System.out.println();
-        System.out.println("менеджеры равны?");
-        System.out.println(taskManager.equals(taskManager1));
+        FileBackedTaskManager taskManager3 = FileBackedTaskManager.loadFromFile(taskManager.getFile());
+        printAllTasks(taskManager3);
         System.out.println();
         System.out.println("Удаляю задачу");
         System.out.println();
-        taskManager.deleteTaskById(task.getId());
+        taskManager3.deleteTaskById(task.getId());
         System.out.println("содержание менеджера");
         System.out.println();
-        printAllTasks(taskManager);
+        printAllTasks(taskManager3);
         System.out.println();
         System.out.println("содержание восстановленного из файла менеджера");
-        taskManager1 = FileBackedTaskManager.loadFromFile(taskManager.getFile());
-        printAllTasks(taskManager1);
-        System.out.println();
-        System.out.println("менеджеры равны?");
-        System.out.println(taskManager.equals(taskManager1));
+        FileBackedTaskManager taskManager4 = FileBackedTaskManager.loadFromFile(taskManager.getFile());
+        printAllTasks(taskManager4);
         System.out.println();
         System.out.println("Удаляю эпики и задачу - делаю пустым файл");
         System.out.println();
-        taskManager.removeEpics();
-        taskManager.removeTasks();
+        taskManager4.removeEpics();
+        taskManager4.removeTasks();
         System.out.println("содержание менеджера");
         System.out.println();
-        taskManager1 = FileBackedTaskManager.loadFromFile(taskManager.getFile());
-        printAllTasks(taskManager);
+        FileBackedTaskManager taskManager5 = FileBackedTaskManager.loadFromFile(taskManager.getFile());
+        printAllTasks(taskManager4);
         System.out.println("содержание восстановленного из пустого файла менеджера");
         System.out.println();
-        printAllTasks(taskManager1);
-        System.out.println("менеджеры равны?");
-        System.out.println(taskManager.equals(taskManager1));
+        printAllTasks(taskManager5);
     }
 
     private static void printAllTasks(TaskManager manager) {
