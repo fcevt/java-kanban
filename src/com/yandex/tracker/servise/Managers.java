@@ -7,7 +7,7 @@ public class Managers {
     private Managers() {
     }
 
-    public static FileBackedTaskManager getDefault() {
+    public static TaskManager getDefault() {
         return new FileBackedTaskManager(new File(System.getProperty("user.dir"), "tasksFile.txt"));
     }
 
