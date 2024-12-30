@@ -15,6 +15,13 @@ public class Task {
         this.name = name;
     }
 
+    public Task(int id, String name, String description, TaskStatus status) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = status;
+    }
+
     public int getId() {
         return id;
     }
@@ -46,6 +53,10 @@ public class Task {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String toStringToSave() {
+        return String.format("%d,%s,%s,%s,%s", id, TaskType.TASK, name, description, status);
     }
 
     @Override
