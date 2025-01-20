@@ -44,6 +44,12 @@ public class Task implements Comparable<Task> {
         this.duration = duration;
     }
 
+    public String toStringToSave() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        return String.format("%d,%s,%s,%s,%s,%s,%d", id, TaskType.TASK, name, description, status,
+                startTime.format(formatter), duration.toMinutes());
+    }
+
     public LocalDateTime getEndTime() {
         return startTime.plus(duration);
     }
@@ -70,12 +76,6 @@ public class Task implements Comparable<Task> {
 
     public TaskStatus getStatus() {
         return status;
-    }
-
-    public String toStringToSave() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-        return String.format("%d,%s,%s,%s,%s,%s,%d", id, TaskType.TASK, name, description, status,
-                startTime.format(formatter), duration.toMinutes());
     }
 
     public void setId(int id) {
