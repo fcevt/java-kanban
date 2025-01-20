@@ -17,7 +17,7 @@ public interface TaskManager {
     ArrayList<Subtask> getListOfSubtasks();
 
     // получение списка подзадач определенного эпика
-    ArrayList<Subtask> getListOfEpicSubtask(int epicId);
+    List<Subtask> getListOfEpicSubtask(int epicId);
 
     // удаление всех задач списка
     void removeTasks();

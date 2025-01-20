@@ -19,7 +19,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     //добавление просмотренных тасков в конец истории просмотров
-    Node linkLast(Task task) {
+    private Node linkLast(Task task) {
         Node node = new Node(task, tail, null);
         if (head == null) {
             head = node;
@@ -31,7 +31,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     //перекладывание истории из связного списка в ArrayList
-    List<Task> getTasks() {
+    private List<Task> getTasks() {
         List<Task> browsingHistory = new ArrayList<>();
         Node  node = head;
         while (node != null) {
