@@ -1,16 +1,20 @@
 package com.yandex.tracker.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Subtask extends Task {
     private int epicId;
 
-
-    public Subtask(String description, String name) {
-        super(description, name);
-        this.epicId = 0;
+    public Subtask(String name, String description) {
+        super(name, description);
+        epicId = 0;
     }
 
-    public Subtask(int id, String name, String description, TaskStatus status, int epicId) {
-        super(id, name, description, status);
+    public Subtask(int id, String name, String description, TaskStatus status, LocalDateTime startTime,
+                   Duration duration, int epicId) {
+        super(id, name, description, status, startTime, duration);
         this.epicId = epicId;
     }
 
@@ -24,8 +28,9 @@ public class Subtask extends Task {
 
     @Override
     public String toStringToSave() {
-        return String.format("%d,%s,%s,%s,%s,%s", getId(), TaskType.SUBTASK, getName(), getDescription(), getStatus(),
-                getEpicId());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        return String.format("%d,%s,%s,%s,%s,%s,%d,%d", getId(), TaskType.SUBTASK, getName(), getDescription(),
+                getStatus(), getStartTime().format(formatter), getDuration().toMinutes(), getEpicId());
     }
 
     @Override
@@ -36,6 +41,7 @@ public class Subtask extends Task {
                 ", description='" + getDescription().length() + '\'' +
                 ", id=" + getId() +
                 ", status=" + getStatus() +
+                ", startTime=" + getStartTime() +
                 '}';
     }
 }

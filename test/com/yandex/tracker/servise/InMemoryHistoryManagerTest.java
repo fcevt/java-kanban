@@ -3,15 +3,21 @@ package com.yandex.tracker.servise;
 
 import com.yandex.tracker.model.Task;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
 class InMemoryHistoryManagerTest {
+    TaskManager taskManager;
 
-// тест на то что история задач не сохраняет повторы.
+    @BeforeEach
+    void setManager() {
+        taskManager = Managers.getDefault();
+    }
+
+    // тест на то что история задач не сохраняет повторы.
     @Test
     void historyHasNoRepetitionsTest() {
-        TaskManager taskManager = Managers.getDefault();
         Task task = taskManager.createTask(new Task("a", "a"));
         Task task1 = taskManager.createTask(new Task("a", "a"));
         Task task2 = taskManager.createTask(new Task("a", "a"));
@@ -27,7 +33,6 @@ class InMemoryHistoryManagerTest {
     // тест на то что в истории сохраняется порядок вызова.
     @Test
     void savingTheOrderOfCallingTasksInManagerTest() {
-        TaskManager taskManager = Managers.getDefault();
         Task task = taskManager.createTask(new Task("a", "a"));
         Task task1 = taskManager.createTask(new Task("a", "a"));
         Task task2 = taskManager.createTask(new Task("a", "a"));
@@ -39,9 +44,9 @@ class InMemoryHistoryManagerTest {
         Assertions.assertEquals(task2, taskManager.getHistory().get(2));
     }
 
+    //тест на то что повторный вызов перемещает задачу в конец истории
     @Test
     void repeatedCallsMovedToTheEnd() {
-        TaskManager taskManager = Managers.getDefault();
         Task task = taskManager.createTask(new Task("a", "a"));
         Task task1 = taskManager.createTask(new Task("a", "a"));
         Task task2 = taskManager.createTask(new Task("a", "a"));
@@ -55,6 +60,28 @@ class InMemoryHistoryManagerTest {
         Assertions.assertEquals(task, taskManager.getHistory().get(2));
         taskManager.getTaskById(task2.getId());
         Assertions.assertEquals(task2, taskManager.getHistory().get(2));
+    }
+
+    //тест на удаление из истории по id из середины конца и начала
+    @Test
+    void deleteFromHistoryTest() {
+        InMemoryTaskManager taskManager1 = (InMemoryTaskManager) taskManager;
+        Task task = taskManager1.createTask(new Task("a", "a"));
+        Task task1 = taskManager1.createTask(new Task("a", "a"));
+        Task task2 = taskManager1.createTask(new Task("a", "a"));
+        taskManager1.getTaskById(task.getId());
+        taskManager1.getTaskById(task1.getId());
+        taskManager1.getTaskById(task2.getId());
+        Assertions.assertEquals(3, taskManager1.getHistory().size());
+        taskManager1.deleteTaskById(task1.getId());                             //удаление из середины
+        Assertions.assertEquals(2, taskManager1.getHistory().size());
+        Assertions.assertEquals(task, taskManager1.getHistory().getFirst());
+        Assertions.assertEquals(task2, taskManager1.getHistory().getLast());
+        taskManager1.deleteTaskById(task2.getId());                            //удаление из конца истории
+        Assertions.assertEquals(1, taskManager1.getHistory().size());
+        Assertions.assertEquals(task, taskManager1.getHistory().getFirst());
+        taskManager1.deleteTaskById(task.getId());                             //удаление последней записи
+        Assertions.assertEquals(0, taskManager1.getHistory().size());
     }
 
 }
