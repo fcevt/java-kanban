@@ -24,7 +24,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
         FileBackedTaskManager taskManager1 = (FileBackedTaskManager) taskManager;
         taskManager1.createTask(new Task(0, "e", "r", TaskStatus.NEW,
                 LocalDateTime.of(2025, 1, 1, 6, 0), Duration.ofMinutes(30)));
-        Epic epic = taskManager1.createEpic(new Epic("a","b"));
+        Epic epic = taskManager1.createEpic(new Epic("a","b")).get();
         taskManager1.createSubtask(new Subtask(0, "a", "b", TaskStatus.NEW,
                 LocalDateTime.of(2025, 1,1, 7, 0), Duration.ofMinutes(30),
                 epic.getId()), epic.getId());
@@ -41,10 +41,10 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
         FileBackedTaskManager taskManager1 = (FileBackedTaskManager) taskManager;
         taskManager1.createTask(new Task(0, "e", "r", TaskStatus.NEW,
                 LocalDateTime.of(2025, 1, 1, 6, 0), Duration.ofMinutes(30)));
-        Epic epic = taskManager1.createEpic(new Epic("b", "c"));
+        Epic epic = taskManager1.createEpic(new Epic("b", "c")).get();
         Subtask subtask = taskManager1.createSubtask(new Subtask(0, "a", "b", TaskStatus.NEW,
                 LocalDateTime.of(2025, 1,1, 7, 0), Duration.ofMinutes(30),
-                epic.getId()), epic.getId());
+                epic.getId()), epic.getId()).get();
         FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(taskManager1.getFile());
         Assertions.assertEquals(taskManager1.getTasks(), taskManager2.getTasks());
         Assertions.assertEquals(taskManager1.getEpics(), taskManager2.getEpics());

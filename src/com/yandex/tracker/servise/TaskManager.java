@@ -7,6 +7,7 @@ import com.yandex.tracker.model.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskManager {
     // получение списков задач
@@ -34,11 +35,11 @@ public interface TaskManager {
     Subtask getSubtasksById(int id);
 
     // создание задач
-    Task createTask(Task task);
+    Optional<Task> createTask(Task task);
 
-    Epic createEpic(Epic epic);
+    Optional<Epic> createEpic(Epic epic);
 
-    Subtask createSubtask(Subtask subtask, int epicId);
+    Optional<Subtask> createSubtask(Subtask subtask, int epicId);
 
     //обновление данных
     void updateTask(Task task);
@@ -60,4 +61,7 @@ public interface TaskManager {
 
     // получение истории просмотров
     List<Task> getHistory();
+
+    //получение сортированного по времени списка задач
+    List<Task> getPrioritizedTasks();
 }

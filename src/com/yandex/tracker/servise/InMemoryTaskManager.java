@@ -79,9 +79,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeTasks() {
         for (Integer id : tasks.keySet()) {
             browsingHistory.remove(id);
+            deleteTaskFromPrioritizedTasks(id);
         }
         tasks.clear();
-        deleteAllTasksFromPrioritizedTasks();
     }
 
     @Override
@@ -91,16 +91,17 @@ public class InMemoryTaskManager implements TaskManager {
         }
         for (Integer id : subtasks.keySet()) {
             browsingHistory.remove(id);
+            deleteTaskFromPrioritizedTasks(id);
         }
         epics.clear();
         subtasks.clear();
-        deleteAllSubtasksFromPrioritizedTasks();
     }
 
     @Override
     public void removeSubtasks() {
         for (Integer id : subtasks.keySet()) {
             browsingHistory.remove(id);
+            deleteTaskFromPrioritizedTasks(id);
         }
         subtasks.clear();
         for (Epic epic : epics.values()) {
@@ -109,7 +110,6 @@ public class InMemoryTaskManager implements TaskManager {
             updateEpic(epic);
             updateEpicTime(epic.getId());
         }
-        deleteAllSubtasksFromPrioritizedTasks();
     }
 
     // получение задач по id
@@ -133,41 +133,81 @@ public class InMemoryTaskManager implements TaskManager {
 
     // создание задач
     @Override
-    public Task createTask(Task task) {
+    public Optional<Task> createTask(Task task) {
         id++;
         task.setId(id);
+        try {
+            addToPrioritizedTasks(task);
+        } catch (TimeIntersectionException e) {
+            System.out.println(e.getMessage());
+            return Optional.empty();
+        }
         tasks.put(id, task);
-        addToPrioritizedTasks(task);
-        return task;
+        return Optional.of(task);
     }
 
     @Override
-    public Epic createEpic(Epic epic) {
+    public Optional<Epic> createEpic(Epic epic) {
         id++;
         epic.setId(id);
         epics.put(id, epic);
-        return epic;
+        return Optional.of(epic);
     }
 
     @Override
-    public Subtask createSubtask(Subtask subtask, int epicId) {
+    public Optional<Subtask> createSubtask(Subtask subtask, int epicId) {
         id++;
         subtask.setId(id);
         subtask.setEpicId(epicId);
+        try {
+            addToPrioritizedTasks(subtask);
+        } catch (TimeIntersectionException e) {
+            System.out.println(e.getMessage());
+            return Optional.empty();
+        }
         subtasks.put(id, subtask);
         Epic epic = epics.get(epicId);
         epic.addSubtaskToList(subtask.getId());
         updateEpic(epic);
         updateEpicStatus(epic.getId());
-        addToPrioritizedTasks(subtask);
         updateEpicTime(subtask.getEpicId());
-        return subtask;
+        return Optional.of(subtask);
     }
 
     //обновление данных
     @Override
     public void updateTask(Task task) {
-        updatePrioritizedTasks(task);
+        final int id = task.getId();
+        final Task savedTask = tasks.get(id);
+        try {
+            if (savedTask == null) {
+                throw new NonExistingTaskException("Задача не обновлена т.к задачи с id=" + id + " не существует");
+            }
+            if (task.getStartTime().isEqual(savedTask.getStartTime()) && //если в метод передали задачу с
+                    task.getEndTime().isEqual(savedTask.getEndTime())) { //временем начала и конца уже существующей
+                prioritizedTasks.removeIf(t -> t.equals(task));    //задачи
+                prioritizedTasks.add(task);
+                tasks.put(task.getId(), task);
+                return;
+            }
+            prioritizedTasks.stream()
+                    .filter(existingTask -> timeIntersectionSearch(task, existingTask))
+                    .findFirst()
+                    .ifPresentOrElse(
+                            // Если нашлась задача с пересекающимся временем, то генерируем исключение
+                            overlappedTask -> {
+                                throw new TimeIntersectionException("Задача не обновлена т.к пересекается во времени с" +
+                                        " уже существующей");
+                            },
+                            () -> {
+                                prioritizedTasks.removeIf(t -> t.equals(task));
+                                prioritizedTasks.add(task);
+                            });
+        } catch (TimeIntersectionException | NonExistingTaskException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+        tasks.put(task.getId(), task);
     }
 
     @Override
@@ -177,14 +217,45 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubtask(Subtask subtask) {
-        updatePrioritizedTasks(subtask);
+        final int id = subtask.getId();
+        final int epicId = subtask.getEpicId();
+        final Subtask savedTask = subtasks.get(id);
+        try {
+            if (savedTask == null) {
+                throw new NonExistingTaskException("Задача не обновлена т.к задачи с id=" + id + " не существует");
+            }
+            if (subtask.getStartTime().isEqual(savedTask.getStartTime()) && //если в метод передали задачу с
+                    subtask.getEndTime().isEqual(savedTask.getEndTime())) { //временем начала и конца уже существующей
+                prioritizedTasks.removeIf(t -> t.equals(subtask));    //задачи
+                prioritizedTasks.add(subtask);
+                subtasks.put(id, subtask);
+                updateEpicStatus(epicId);
+                return;
+            }
+            prioritizedTasks.stream()
+                    .filter(existingTask -> timeIntersectionSearch(subtask, existingTask))
+                    .findFirst()
+                    .ifPresent(t -> {
+                        throw new TimeIntersectionException("Задача не обновлена т.к пересекается во" +
+                            " времени с уже существующей");
+                    });
+        } catch (TimeIntersectionException | NonExistingTaskException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+        prioritizedTasks.removeIf(t -> t.equals(subtask));
+        prioritizedTasks.add(subtask);
+        subtasks.put(id, subtask);
+        updateEpicTime(epicId);
+        updateEpicStatus(epicId);
     }
 
     // удаление по id
     @Override
     public void deleteTaskById(int id) {
         browsingHistory.remove(id);
-        deleteOneTaskFromPrioritizedTasks(tasks.remove(id));
+        deleteTaskFromPrioritizedTasks(id);
+        tasks.remove(id);
     }
 
     @Override
@@ -194,7 +265,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (Integer subtaskId : epic.getListOfSubtasks()) {
             subtasks.remove(subtaskId);
             browsingHistory.remove(subtaskId);
-            deleteOneSubtaskFromPrioritizedTasks(subtaskId);
+            deleteTaskFromPrioritizedTasks(subtaskId);
         }
     }
 
@@ -202,10 +273,10 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteSubtaskById(int id) {
         Subtask subtask = subtasks.remove(id);
         browsingHistory.remove(id);
+        deleteTaskFromPrioritizedTasks(id);
         Epic epic = epics.get(subtask.getEpicId());
         epic.removeSubtaskFromList(id);
         updateEpicStatus(subtask.getEpicId());
-        deleteOneSubtaskFromPrioritizedTasks(id);
         updateEpicTime(subtask.getEpicId());
     }
 
@@ -266,6 +337,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     //получение сортированного по времени списка задач
+    @Override
     public List<Task> getPrioritizedTasks() {
         return new ArrayList<>(prioritizedTasks);
     }
@@ -338,47 +410,26 @@ public class InMemoryTaskManager implements TaskManager {
         if (task.getDuration().equals(DEFAULT_DURATION)) {
             return;
         }
-        try {
-            if (getPrioritizedTasks().stream()
-                    .anyMatch(t -> timeIntersectionSearch(task, t))) {
-                if (task instanceof Subtask) {
-                    deleteSubtaskById(task.getId());
-                } else {
-                    deleteTaskById(task.getId());
-                }
-                throw new TimeIntersectionException("Задача не создана т.к пересекается во времени с уже" +
-                        "существующей");
-            }
-        } catch (TimeIntersectionException e) {
-            System.out.println(e.getMessage());
-            return;
-        }
-        prioritizedTasks.removeIf(t -> t.equals(task));
-        prioritizedTasks.add(task);
+        prioritizedTasks.stream()
+                .filter(existingTask -> timeIntersectionSearch(task, existingTask))
+                .findFirst()
+                .ifPresentOrElse(
+                        // Если нашлась задача с пересекающимся временем, то генерируем исключение
+                        overlappedTask -> {
+                            throw new TimeIntersectionException("Задача не создана т.к пересекается во времени с уже" +
+                                    "существующей");
+                        },
+                        // если задач пересекающихся по времени нет, то добавляем новую задачу
+
+                        () -> prioritizedTasks.add(task));
     }
 
     public Set<Task> getPrioritizedTasksForLoadFromFile() {
         return prioritizedTasks;
     }
 
-    //удаление задачи из отсортированного списка при удалении задачи по id
-    private void deleteOneTaskFromPrioritizedTasks(Task task) {
-        prioritizedTasks.removeIf(t -> t.equals(task));
-    }
-
     //удаление подзадачи по id из отсортированного списка при удалении эпика по id
-    private void deleteOneSubtaskFromPrioritizedTasks(int id) {
+    private void deleteTaskFromPrioritizedTasks(int id) {
         prioritizedTasks.removeIf(task -> task.getId() == id);
-    }
-
-
-    //удаление всех задач из отсортированного списка
-    private void deleteAllTasksFromPrioritizedTasks() {
-        prioritizedTasks.removeIf(task -> task instanceof Task);
-    }
-
-    //удаление всех подзадач из отсортированного списка
-    private void deleteAllSubtasksFromPrioritizedTasks() {
-        prioritizedTasks.removeIf(task -> task instanceof Subtask);
     }
 }

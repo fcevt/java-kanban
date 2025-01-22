@@ -18,9 +18,9 @@ class InMemoryHistoryManagerTest {
     // тест на то что история задач не сохраняет повторы.
     @Test
     void historyHasNoRepetitionsTest() {
-        Task task = taskManager.createTask(new Task("a", "a"));
-        Task task1 = taskManager.createTask(new Task("a", "a"));
-        Task task2 = taskManager.createTask(new Task("a", "a"));
+        Task task = taskManager.createTask(new Task("a", "a")).get();
+        Task task1 = taskManager.createTask(new Task("a", "a")).get();
+        Task task2 = taskManager.createTask(new Task("a", "a")).get();
         taskManager.getTaskById(task.getId());
         taskManager.getTaskById(task1.getId());
         taskManager.getTaskById(task2.getId());
@@ -33,9 +33,9 @@ class InMemoryHistoryManagerTest {
     // тест на то что в истории сохраняется порядок вызова.
     @Test
     void savingTheOrderOfCallingTasksInManagerTest() {
-        Task task = taskManager.createTask(new Task("a", "a"));
-        Task task1 = taskManager.createTask(new Task("a", "a"));
-        Task task2 = taskManager.createTask(new Task("a", "a"));
+        Task task = taskManager.createTask(new Task("a", "a")).get();
+        Task task1 = taskManager.createTask(new Task("a", "a")).get();
+        Task task2 = taskManager.createTask(new Task("a", "a")).get();
         taskManager.getTaskById(task.getId());
         taskManager.getTaskById(task1.getId());
         taskManager.getTaskById(task2.getId());
@@ -47,9 +47,9 @@ class InMemoryHistoryManagerTest {
     //тест на то что повторный вызов перемещает задачу в конец истории
     @Test
     void repeatedCallsMovedToTheEnd() {
-        Task task = taskManager.createTask(new Task("a", "a"));
-        Task task1 = taskManager.createTask(new Task("a", "a"));
-        Task task2 = taskManager.createTask(new Task("a", "a"));
+        Task task = taskManager.createTask(new Task("a", "a")).get();
+        Task task1 = taskManager.createTask(new Task("a", "a")).get();
+        Task task2 = taskManager.createTask(new Task("a", "a")).get();
         taskManager.getTaskById(task.getId());
         taskManager.getTaskById(task1.getId());
         taskManager.getTaskById(task2.getId());
@@ -66,9 +66,9 @@ class InMemoryHistoryManagerTest {
     @Test
     void deleteFromHistoryTest() {
         InMemoryTaskManager taskManager1 = (InMemoryTaskManager) taskManager;
-        Task task = taskManager1.createTask(new Task("a", "a"));
-        Task task1 = taskManager1.createTask(new Task("a", "a"));
-        Task task2 = taskManager1.createTask(new Task("a", "a"));
+        Task task = taskManager1.createTask(new Task("a", "a")).get();
+        Task task1 = taskManager1.createTask(new Task("a", "a")).get();
+        Task task2 = taskManager1.createTask(new Task("a", "a")).get();
         taskManager1.getTaskById(task.getId());
         taskManager1.getTaskById(task1.getId());
         taskManager1.getTaskById(task2.getId());

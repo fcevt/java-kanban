@@ -17,26 +17,26 @@ public class Main {
         System.out.println();
 
         Task task = taskManager.createTask(new Task(0,"qqqqqq", "wwwwww", TaskStatus.NEW,
-                LocalDateTime.of(2025, 1, 1, 10, 0), Duration.ofMinutes(30)));
+                LocalDateTime.of(2025, 1, 1, 10, 0), Duration.ofMinutes(30))).get();
         Task task1 = taskManager.createTask(new Task(1,"eeee", "rrr",
                 TaskStatus.NEW, LocalDateTime.of(2025, 1, 1, 10, 30),
-                Duration.ofMinutes(30)));
+                Duration.ofMinutes(30))).get();
         Epic epic = taskManager.createEpic(new Epic(2,"ttttttt", "yyyyyyyy",
-                TaskStatus.NEW, new ArrayList<>()));
+                TaskStatus.NEW, new ArrayList<>())).get();
         Epic epic1 = taskManager.createEpic(new Epic(3,"uuuuuuu",
-                "iiiiiiiii", TaskStatus.NEW, new ArrayList<>()));
+                "iiiiiiiii", TaskStatus.NEW, new ArrayList<>())).get();
         Subtask subtask = taskManager.createSubtask(new Subtask(4,"oooooooooo",
                 "ppppppppp", TaskStatus.NEW,
                 LocalDateTime.of(2025, 1, 1, 9, 0),
-                Duration.ofMinutes(30), epic.getId()), epic.getId());
+                Duration.ofMinutes(30), epic.getId()), epic.getId()).get();
         Subtask subtask2 = taskManager.createSubtask(new Subtask(5,"aaaaaaaaaaaaa",
                 "sssssssssss", TaskStatus.NEW,
                 LocalDateTime.of(2025, 1, 1, 6, 30),
-                Duration.ofMinutes(30), epic.getId()), epic.getId());
+                Duration.ofMinutes(30), epic.getId()), epic.getId()).get();
         Subtask subtask3 = taskManager.createSubtask(new Subtask(6,"ddddddd",
                 "ffffffffff", TaskStatus.NEW,
                 LocalDateTime.of(2025, 1, 1, 8, 0),
-                Duration.ofMinutes(30), epic.getId()), epic.getId());
+                Duration.ofMinutes(30), epic.getId()), epic.getId()).get();
 
         printAllTasks(taskManager);
         System.out.println();
@@ -44,27 +44,49 @@ public class Main {
         System.out.println("содержание восстановленного из файла менеджера");
         printAllTasks(taskManager1);
         System.out.println();
-        System.out.println("меняю статус подзадачи и ее время");
-        System.out.println();
-        taskManager1.updateSubtask(new Subtask(5, "ggggggg", "hhhhhh",
-                TaskStatus.DONE, LocalDateTime.of(2025, 1, 1, 4, 30),
-                Duration.ofMinutes(60), 3));
+        System.out.println("обновляю задачу по времени");
+        task1.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 30));
+        taskManager1.updateTask(task1);
         System.out.println("содержание менеджера");
         printAllTasks(taskManager1);
         System.out.println();
         System.out.println("содержание восстановленного из файла менеджера");
         FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(taskManager1.getFile());
         printAllTasks(taskManager2);
-        System.out.println();
-        System.out.println("меняю время подзадачи чтобы она пересеклась с уже существующей");
-        taskManager2.updateSubtask(new Subtask(5, "ggggg", "hhhhh",
-                TaskStatus.DONE, LocalDateTime.of(2025, 1, 1, 6, 25),
-                Duration.ofMinutes(30), 3));
+        System.out.println();//
+        System.out.println("создаю подзадачу пересекающуюся по времени с существующей");
+        taskManager2.createSubtask(new Subtask(6,"ddddddd",
+                "ffffffffff", TaskStatus.NEW,
+                LocalDateTime.of(2025, 1, 1, 8, 0),
+                Duration.ofMinutes(30), epic.getId()), epic.getId()).get();
         System.out.println("содержание менеджера");
         printAllTasks(taskManager2);
         System.out.println();
         System.out.println("содержание восстановленного из файла менеджера");
-        FileBackedTaskManager taskManager3 = FileBackedTaskManager.loadFromFile(taskManager2.getFile());
+        FileBackedTaskManager taskManager20 = FileBackedTaskManager.loadFromFile(taskManager2.getFile());
+        printAllTasks(taskManager20);
+        System.out.println();
+        System.out.println("обновляю статус подзадачи и ее время");
+        System.out.println();
+        taskManager20.updateSubtask(new Subtask(5, "ggggggg", "hhhhhh",
+                TaskStatus.DONE, LocalDateTime.of(2025, 1, 1, 4, 30),
+                Duration.ofMinutes(60), 3));
+        System.out.println("содержание менеджера");
+        printAllTasks(taskManager20);
+        System.out.println();
+        System.out.println("содержание восстановленного из файла менеджера");
+        FileBackedTaskManager taskManager112 = FileBackedTaskManager.loadFromFile(taskManager20.getFile());
+        printAllTasks(taskManager112);
+        System.out.println();
+        System.out.println("меняю время подзадачи чтобы она пересеклась с уже существующей");
+        taskManager112.updateSubtask(new Subtask(5, "ggggg", "hhhhh",
+                TaskStatus.DONE, LocalDateTime.of(2025, 1, 1, 6, 25),
+                Duration.ofMinutes(30), 3));
+        System.out.println("содержание менеджера");
+        printAllTasks(taskManager112);
+        System.out.println();
+        System.out.println("содержание восстановленного из файла менеджера");
+        FileBackedTaskManager taskManager3 = FileBackedTaskManager.loadFromFile(taskManager112.getFile());
         printAllTasks(taskManager3);
         System.out.println("создаю задачу пересекающуюся с уже созданной");
         taskManager3.createTask(new Task(0,"xxx", "xxx", TaskStatus.NEW,
@@ -108,9 +130,9 @@ public class Main {
         printAllTasks(taskManager6);
         System.out.println();
         System.out.println("добавляю подзадачу в пустой эпик");
-        taskManager6.createSubtask(new Subtask(5, "nnn", "mmmm",
+        Subtask subtask1 = taskManager6.createSubtask(new Subtask(5, "nnn", "mmmm",
                 TaskStatus.DONE, LocalDateTime.of(2025, 1, 1, 22, 30),
-                Duration.ofMinutes(120), epic1.getId()), epic1.getId());
+                Duration.ofMinutes(120), epic1.getId()), epic1.getId()).get();
         System.out.println("содержание менеджера");
         printAllTasks(taskManager6);
         System.out.println();
@@ -119,7 +141,7 @@ public class Main {
         printAllTasks(taskManager9);
         System.out.println();
         System.out.println("удаляю подзадачу из эпика");
-        taskManager9.deleteSubtaskById(10);
+        taskManager9.deleteSubtaskById(subtask1.getId());
         System.out.println("содержание менеджера");
         printAllTasks(taskManager9);
         System.out.println();
