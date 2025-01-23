@@ -1,6 +1,7 @@
 package com.yandex.tracker;
 import com.yandex.tracker.model.*;
 import com.yandex.tracker.servise.FileBackedTaskManager;
+import com.yandex.tracker.servise.TimeIntersectionException;
 
 import java.io.File;
 import java.time.Duration;
@@ -43,34 +44,26 @@ public class Main {
         FileBackedTaskManager taskManager1 = FileBackedTaskManager.loadFromFile(taskManager.getFile());
         System.out.println("содержание восстановленного из файла менеджера");
         printAllTasks(taskManager1);
-        System.out.println();
-        System.out.println("обновляю задачу по времени");
-        task1.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 30));
-        taskManager1.updateTask(task1);
+        System.out.println("создаю подзадачу пересекающуюся по времени с существующей");
+        try {
+            taskManager1.createSubtask(new Subtask(6,"ddddddd",
+                    "ffffffffff", TaskStatus.NEW,
+                    LocalDateTime.of(2025, 1, 1, 8, 0),
+                    Duration.ofMinutes(30), epic.getId()), epic.getId());
+        } catch (TimeIntersectionException e) {
+            System.out.println(e.getMessage());
+        }
         System.out.println("содержание менеджера");
         printAllTasks(taskManager1);
         System.out.println();
         System.out.println("содержание восстановленного из файла менеджера");
-        FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(taskManager1.getFile());
-        printAllTasks(taskManager2);
-        System.out.println();//
-        System.out.println("создаю подзадачу пересекающуюся по времени с существующей");
-        taskManager2.createSubtask(new Subtask(6,"ddddddd",
-                "ffffffffff", TaskStatus.NEW,
-                LocalDateTime.of(2025, 1, 1, 8, 0),
-                Duration.ofMinutes(30), epic.getId()), epic.getId()).get();
-        System.out.println("содержание менеджера");
-        printAllTasks(taskManager2);
-        System.out.println();
-        System.out.println("содержание восстановленного из файла менеджера");
-        FileBackedTaskManager taskManager20 = FileBackedTaskManager.loadFromFile(taskManager2.getFile());
+        FileBackedTaskManager taskManager20 = FileBackedTaskManager.loadFromFile(taskManager1.getFile());
         printAllTasks(taskManager20);
         System.out.println();
-        System.out.println("обновляю статус подзадачи и ее время");
+        System.out.println("обновляю статус подзадачи");
         System.out.println();
-        taskManager20.updateSubtask(new Subtask(5, "ggggggg", "hhhhhh",
-                TaskStatus.DONE, LocalDateTime.of(2025, 1, 1, 4, 30),
-                Duration.ofMinutes(60), 3));
+        subtask2.setStatus(TaskStatus.DONE);
+        taskManager20.updateSubtask(subtask2);
         System.out.println("содержание менеджера");
         printAllTasks(taskManager20);
         System.out.println();
@@ -78,25 +71,19 @@ public class Main {
         FileBackedTaskManager taskManager112 = FileBackedTaskManager.loadFromFile(taskManager20.getFile());
         printAllTasks(taskManager112);
         System.out.println();
-        System.out.println("меняю время подзадачи чтобы она пересеклась с уже существующей");
-        taskManager112.updateSubtask(new Subtask(5, "ggggg", "hhhhh",
-                TaskStatus.DONE, LocalDateTime.of(2025, 1, 1, 6, 25),
-                Duration.ofMinutes(30), 3));
+        System.out.println("создаю задачу пересекающуюся с уже созданной");
+        try {
+            taskManager112.createTask(new Task(0,"xxx", "xxx", TaskStatus.NEW,
+                    LocalDateTime.of(2025, 1, 1, 10, 0), Duration.ofMinutes(30)));
+        } catch (TimeIntersectionException e) {
+            System.out.println(e.getMessage());
+        }
+        System.out.println();
         System.out.println("содержание менеджера");
         printAllTasks(taskManager112);
         System.out.println();
         System.out.println("содержание восстановленного из файла менеджера");
-        FileBackedTaskManager taskManager3 = FileBackedTaskManager.loadFromFile(taskManager112.getFile());
-        printAllTasks(taskManager3);
-        System.out.println("создаю задачу пересекающуюся с уже созданной");
-        taskManager3.createTask(new Task(0,"xxx", "xxx", TaskStatus.NEW,
-                LocalDateTime.of(2025, 1, 1, 10, 0), Duration.ofMinutes(30)));
-        System.out.println();
-        System.out.println("содержание менеджера");
-        printAllTasks(taskManager3);
-        System.out.println();
-        System.out.println("содержание восстановленного из файла менеджера");
-        FileBackedTaskManager taskManager4 = FileBackedTaskManager.loadFromFile(taskManager3.getFile());
+        FileBackedTaskManager taskManager4 = FileBackedTaskManager.loadFromFile(taskManager112.getFile());
         printAllTasks(taskManager4);
         System.out.println();
         System.out.println("создаю задачу без времени");
@@ -147,6 +134,14 @@ public class Main {
         System.out.println();
         System.out.println("содержание восстановленного менеджера");
         FileBackedTaskManager taskManager8 = FileBackedTaskManager.loadFromFile(taskManager9.getFile());
+        printAllTasks(taskManager8);
+        System.out.println();
+        System.out.println("удаляю таску со временем");
+        taskManager8.deleteTaskById(2);
+        System.out.println();
+        printAllTasks(taskManager8);
+        System.out.println("удаляю таску без времени");
+        taskManager8.deleteTaskById(8);
         printAllTasks(taskManager8);
         System.out.println("Удаляю эпики и задачу - делаю пустым файл");
         System.out.println();
