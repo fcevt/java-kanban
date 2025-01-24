@@ -136,9 +136,6 @@ public class InMemoryTaskManager implements TaskManager {
             return Optional.of(task);
         }
         addToPrioritizedTasks(task);
-        if (!prioritizedTasks.contains(task)) {
-            return Optional.empty();
-        }
         tasks.put(id, task);
         return Optional.of(task);
     }
@@ -157,9 +154,6 @@ public class InMemoryTaskManager implements TaskManager {
         subtask.setId(id);
         subtask.setEpicId(epicId);
         addToPrioritizedTasks(subtask);
-        if (!prioritizedTasks.contains(subtask)) {
-            return Optional.empty();
-        }
         subtasks.put(id, subtask);
         Epic epic = epics.get(epicId);
         epic.addSubtaskToList(subtask.getId());
@@ -176,6 +170,13 @@ public class InMemoryTaskManager implements TaskManager {
         if (savedTask == null) {
             throw new NonExistingTaskException("Задача не обновлена т.к задачи с id=" + id + " не существует");
         }
+        if (task.getStartTime().isEqual(savedTask.getStartTime()) && //если в метод передали задачу с
+                task.getEndTime().isEqual(savedTask.getEndTime())) { //временем начала и конца уже существующей
+            deleteTaskFromPrioritizedTasks(savedTask);    //задачи
+            prioritizedTasks.add(task);
+            tasks.put(task.getId(), task);
+            return;
+        }
         deleteTaskFromPrioritizedTasks(savedTask);
         tasks.put(task.getId(), task);
         addToPrioritizedTasks(task);
@@ -191,9 +192,16 @@ public class InMemoryTaskManager implements TaskManager {
         final int id = subtask.getId();
         final int epicId = subtask.getEpicId();
         final Subtask savedTask = subtasks.get(id);
-
         if (savedTask == null) {
             throw new NonExistingTaskException("Задача не обновлена т.к задачи с id=" + id + " не существует");
+        }
+        if (subtask.getStartTime().isEqual(savedTask.getStartTime()) && //если в метод передали задачу с
+                subtask.getEndTime().isEqual(savedTask.getEndTime())) { //временем начала и конца уже существующей
+            deleteTaskFromPrioritizedTasks(savedTask);    //задачи
+            prioritizedTasks.add(subtask);
+            tasks.put(subtask.getId(), subtask);
+            updateEpicStatus(epicId);
+            return;
         }
         deleteTaskFromPrioritizedTasks(savedTask);
         subtasks.put(subtask.getId(), subtask);
