@@ -201,12 +201,14 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.add(subtask);
             tasks.put(subtask.getId(), subtask);
             updateEpicStatus(epicId);
+            updateEpicTime(epicId);
             return;
         }
         deleteTaskFromPrioritizedTasks(savedTask);
         subtasks.put(subtask.getId(), subtask);
         addToPrioritizedTasks(subtask);
         updateEpicStatus(epicId);
+        updateEpicTime(epicId);
     }
 
     // удаление по id
