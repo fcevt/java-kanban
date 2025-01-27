@@ -3,10 +3,10 @@ package com.yandex.tracker.servise;
 import com.yandex.tracker.model.Epic;
 import com.yandex.tracker.model.Subtask;
 import com.yandex.tracker.model.Task;
-import com.yandex.tracker.model.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskManager {
     // получение списков задач
@@ -17,7 +17,7 @@ public interface TaskManager {
     ArrayList<Subtask> getListOfSubtasks();
 
     // получение списка подзадач определенного эпика
-    ArrayList<Subtask> getListOfEpicSubtask(int epicId);
+    List<Subtask> getListOfEpicSubtask(int epicId);
 
     // удаление всех задач списка
     void removeTasks();
@@ -34,11 +34,11 @@ public interface TaskManager {
     Subtask getSubtasksById(int id);
 
     // создание задач
-    Task createTask(Task task);
+    Optional<Task> createTask(Task task);
 
-    Epic createEpic(Epic epic);
+    Optional<Epic> createEpic(Epic epic);
 
-    Subtask createSubtask(Subtask subtask, int epicId);
+    Optional<Subtask> createSubtask(Subtask subtask, int epicId);
 
     //обновление данных
     void updateTask(Task task);
@@ -47,17 +47,16 @@ public interface TaskManager {
 
     void updateSubtask(Subtask subtask);
 
+    // получение истории просмотров
+    List<Task> getHistory();
+
+    //получение сортированного по времени списка задач
+    List<Task> getPrioritizedTasks();
+
     // удаление по id
     void deleteTaskById(int id);
 
     void deleteEpicById(int id);
 
     void deleteSubtaskById(int id);
-
-    void updateEpicStatus(int epicId, TaskStatus newStatus);
-
-    void updateEpicStatus(int epicId);
-
-    // получение истории просмотров
-    List<Task> getHistory();
 }
