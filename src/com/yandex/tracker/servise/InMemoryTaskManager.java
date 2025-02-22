@@ -110,20 +110,32 @@ public class InMemoryTaskManager implements TaskManager {
     // получение задач по id
     @Override
     public Task getTaskById(int id) {
-        browsingHistory.add(tasks.get(id));
-        return tasks.get(id);
+        Task task = tasks.get(id);
+        if (task == null) {
+            throw new NonExistingTaskException("Задачи с таким id не существует.");
+        }
+        browsingHistory.add(task);
+        return task;
     }
 
     @Override
     public Epic getEpicById(int id) {
-        browsingHistory.add(epics.get(id));
-        return epics.get(id);
+        Epic epic = epics.get(id);
+        if (epic == null) {
+            throw new NonExistingTaskException("Эпика с таким id не существует.");
+        }
+        browsingHistory.add(epic);
+        return epic;
     }
 
     @Override
     public Subtask getSubtasksById(int id) {
-        browsingHistory.add(subtasks.get(id));
-        return subtasks.get(id);
+        Subtask subtask = subtasks.get(id);
+        if (subtask == null) {
+            throw new NonExistingTaskException("Подзадачи с таким id не существует");
+        }
+        browsingHistory.add(subtask);
+        return subtask;
     }
 
     // создание задач
@@ -135,8 +147,8 @@ public class InMemoryTaskManager implements TaskManager {
             tasks.put(task.getId(), task);
             return Optional.of(task);
         }
-        addToPrioritizedTasks(task);
         tasks.put(id, task);
+        addToPrioritizedTasks(task);
         return Optional.of(task);
     }
 
@@ -153,12 +165,12 @@ public class InMemoryTaskManager implements TaskManager {
         id++;
         subtask.setId(id);
         subtask.setEpicId(epicId);
-        addToPrioritizedTasks(subtask);
         subtasks.put(id, subtask);
         Epic epic = epics.get(epicId);
         epic.addSubtaskToList(subtask.getId());
         updateEpicStatus(epic.getId());
         updateEpicTime(subtask.getEpicId());
+        addToPrioritizedTasks(subtask);
         return Optional.of(subtask);
     }
 
@@ -330,7 +342,7 @@ public class InMemoryTaskManager implements TaskManager {
                 .ifPresentOrElse(
                         // Если нашлась задача с пересекающимся временем, то генерируем исключение
                         overlappedTask -> {
-                            throw new TimeIntersectionException("Задача не создана т.к пересекается во времени с уже" +
+                            throw new TimeIntersectionException("Задача пересекается во времени с уже" +
                                     "существующей");
                         },
                         // если задач пересекающихся по времени нет, то добавляем новую задачу
