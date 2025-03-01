@@ -17,7 +17,7 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
     public void handle(HttpExchange httpExchange) throws IOException {
         Endpoint endpoint = getEndpoint(httpExchange);
         switch (endpoint) {
-            case GET_PRIORITIZED_TASKS -> sendText(httpExchange, SUCCESSFULLY_CODE, getGson()
+            case GET_PRIORITIZED_TASKS -> sendText(httpExchange, SUCCESSFULLY_CODE, HttpTaskServer.getGson()
                     .toJson(getManager().getPrioritizedTasks()));
             case UNKNOWN -> sendUnknownEndpoint(httpExchange);
 

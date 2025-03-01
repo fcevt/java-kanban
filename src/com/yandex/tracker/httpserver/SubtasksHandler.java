@@ -26,25 +26,25 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
                 if (subtasks.isEmpty()) {
                     sendText(httpExchange, SUCCESSFULLY_CODE, "Подзадач пока нет");
                 } else {
-                    sendText(httpExchange, SUCCESSFULLY_CODE, getGson().toJson(subtasks));
+                    sendText(httpExchange, SUCCESSFULLY_CODE, HttpTaskServer.getGson().toJson(subtasks));
                 }
             }
             case GET_SUBTASK_BY_ID -> {
                 try {
                     Subtask subtask = getManager().getSubtasksById(getIdFromPath(httpExchange));
-                    sendText(httpExchange, SUCCESSFULLY_CODE, getGson().toJson(subtask));
+                    sendText(httpExchange, SUCCESSFULLY_CODE, HttpTaskServer.getGson().toJson(subtask));
                 } catch (NonExistingTaskException e) {
                     sendNotFound(httpExchange, e);
                 }
             }
             case DELETE_SUBTASK_BY_ID -> {
                 getManager().deleteSubtaskById(getIdFromPath(httpExchange));
-                sendText(httpExchange, SUCCESSFULLY_CODE, getGson().toJson("Подзадача удалена"));
+                sendText(httpExchange, SUCCESSFULLY_CODE, HttpTaskServer.getGson().toJson("Подзадача удалена"));
             }
             case POST_CREATE_SUBTASK -> {
                try {
                    String jsonSubtask = new String(httpExchange.getRequestBody().readAllBytes());
-                   Subtask subtask = getGson().fromJson(jsonSubtask, Subtask.class);
+                   Subtask subtask = HttpTaskServer.getGson().fromJson(jsonSubtask, Subtask.class);
                    getManager().createSubtask(subtask, subtask.getEpicId());
                    sendText(httpExchange, SUCCESSFULLY_UPD_OR_CREATE_CODE, "Подзадача создана");
                } catch (TimeIntersectionException exception) {
@@ -54,7 +54,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
             case POST_UPDATE_SUBTASK -> {
                 try {
                     String jsonSubtask = new String(httpExchange.getRequestBody().readAllBytes());
-                    Subtask subtask = getGson().fromJson(jsonSubtask, Subtask.class);
+                    Subtask subtask = HttpTaskServer.getGson().fromJson(jsonSubtask, Subtask.class);
                     getManager().updateSubtask(subtask);
                     sendText(httpExchange, SUCCESSFULLY_UPD_OR_CREATE_CODE, "Подзадача обновлена");
                 } catch (NonExistingTaskException exception) {

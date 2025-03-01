@@ -1,7 +1,5 @@
 package com.yandex.tracker.httpserver;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.yandex.tracker.model.Task;
 import com.yandex.tracker.model.TaskStatus;
 import com.yandex.tracker.servise.InMemoryTaskManager;
@@ -25,11 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TaskHandlerTest {
     TaskManager manager = new InMemoryTaskManager();
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = new GsonBuilder()
-            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-            .registerTypeAdapter(Duration.class, new DurationAdapter())
-            .setPrettyPrinting()
-            .create();
 
     @BeforeEach
     void startServer() throws IOException {
@@ -57,7 +50,7 @@ public class TaskHandlerTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
-        assertEquals(manager.getListOfTasks(), gson.fromJson(response.body(), new TaskListTypeToken().getType()));
+        assertEquals(manager.getListOfTasks(), HttpTaskServer.getGson().fromJson(response.body(), new TaskListTypeToken().getType()));
     }
 
     @Test
@@ -75,7 +68,7 @@ public class TaskHandlerTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
-        assertEquals(manager.getTaskById(task.getId()), gson.fromJson(response.body(), Task.class));
+        assertEquals(manager.getTaskById(task.getId()), HttpTaskServer.getGson().fromJson(response.body(), Task.class));
     }
 
     @Test
@@ -122,7 +115,7 @@ public class TaskHandlerTest {
         URI url = URI.create("http://localhost:8080/tasks");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(task1)))
+                .POST(HttpRequest.BodyPublishers.ofString(HttpTaskServer.getGson().toJson(task1)))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());
@@ -141,7 +134,7 @@ public class TaskHandlerTest {
         URI url = URI.create("http://localhost:8080/tasks");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(task1)))
+                .POST(HttpRequest.BodyPublishers.ofString(HttpTaskServer.getGson().toJson(task1)))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(406, response.statusCode());
@@ -158,7 +151,7 @@ public class TaskHandlerTest {
         URI url = URI.create("http://localhost:8080/tasks/" + task.getId());
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(task1)))
+                .POST(HttpRequest.BodyPublishers.ofString(HttpTaskServer.getGson().toJson(task1)))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());

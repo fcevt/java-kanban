@@ -1,7 +1,5 @@
 package com.yandex.tracker.httpserver;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.yandex.tracker.model.Epic;
 import com.yandex.tracker.model.Subtask;
 import com.yandex.tracker.model.TaskStatus;
@@ -27,11 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class SubtaskHandlerTest {
     TaskManager manager = new InMemoryTaskManager();
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = new GsonBuilder()
-            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-            .registerTypeAdapter(Duration.class, new DurationAdapter())
-            .setPrettyPrinting()
-            .create();
 
     @BeforeEach
     void startServer() throws IOException {
@@ -69,7 +62,7 @@ public class SubtaskHandlerTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
-        assertEquals(manager.getListOfSubtasks(), gson.fromJson(response.body(), new SubtaskListTypeToken().getType()));
+        assertEquals(manager.getListOfSubtasks(), HttpTaskServer.getGson().fromJson(response.body(), new SubtaskListTypeToken().getType()));
     }
 
     @Test
@@ -96,7 +89,7 @@ public class SubtaskHandlerTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
-        assertEquals(manager.getSubtasksById(subtask.getId()), gson.fromJson(response.body(), Subtask.class));
+        assertEquals(manager.getSubtasksById(subtask.getId()), HttpTaskServer.getGson().fromJson(response.body(), Subtask.class));
     }
 
     @Test
@@ -166,7 +159,7 @@ public class SubtaskHandlerTest {
         URI url = URI.create("http://localhost:8080/subtasks");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(subtask)))
+                .POST(HttpRequest.BodyPublishers.ofString(HttpTaskServer.getGson().toJson(subtask)))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());
@@ -190,7 +183,7 @@ public class SubtaskHandlerTest {
         URI url = URI.create("http://localhost:8080/subtasks");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(subtask)))
+                .POST(HttpRequest.BodyPublishers.ofString(HttpTaskServer.getGson().toJson(subtask)))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(406, response.statusCode());
@@ -213,7 +206,7 @@ public class SubtaskHandlerTest {
         URI url = URI.create("http://localhost:8080/subtasks/" + subtask1.getId());
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(subtask)))
+                .POST(HttpRequest.BodyPublishers.ofString(HttpTaskServer.getGson().toJson(subtask)))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());

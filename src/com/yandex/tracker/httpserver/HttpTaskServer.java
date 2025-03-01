@@ -1,10 +1,14 @@
 package com.yandex.tracker.httpserver;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
 import com.yandex.tracker.servise.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 
 public class HttpTaskServer {
@@ -32,6 +36,14 @@ public class HttpTaskServer {
 
     public void stop() {
         httpServer.stop(0);
+    }
+
+    public static Gson getGson() {
+        return new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .registerTypeAdapter(Duration.class, new DurationAdapter())
+                .setPrettyPrinting()
+                .create();
     }
 
     public static void main(String[] args) throws IOException {

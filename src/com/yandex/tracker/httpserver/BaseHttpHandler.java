@@ -1,7 +1,5 @@
 package com.yandex.tracker.httpserver;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.yandex.tracker.model.Endpoint;
 import com.yandex.tracker.servise.*;
@@ -9,8 +7,6 @@ import com.yandex.tracker.servise.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 public class BaseHttpHandler {
     public static final int TIME_INTERACTIONS_CODE = 406;
@@ -18,15 +14,9 @@ public class BaseHttpHandler {
     public static final int SUCCESSFULLY_UPD_OR_CREATE_CODE = 201;
     public static final int SUCCESSFULLY_CODE = 200;
     public static final int BAD_REQUEST_ERROR = 400;
-    private final Gson gson;
     private final TaskManager manager;
 
     protected BaseHttpHandler(TaskManager manager) {
-        gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .setPrettyPrinting()
-                .create();
         this.manager = manager;
     }
 
@@ -56,14 +46,6 @@ public class BaseHttpHandler {
         try (OutputStream os = httpExchange.getResponseBody()) {
             os.write("Некорректно составленный запрос".getBytes(StandardCharsets.UTF_8));
         }
-    }
-
-    public Gson getGson() {
-        return gson;
-    }
-
-    public TaskManager getManager() {
-        return manager;
     }
 
     public Endpoint getEndpoint(HttpExchange httpExchange) {
@@ -132,5 +114,9 @@ public class BaseHttpHandler {
     public int getIdFromPath(HttpExchange exchange) {
         String pathPart = exchange.getRequestURI().getPath().split("/")[2];
         return Integer.parseInt(pathPart);
+    }
+
+    public TaskManager getManager() {
+        return manager;
     }
 }

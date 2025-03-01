@@ -26,25 +26,25 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                 if (tasks.isEmpty()) {
                     sendText(httpExchange, SUCCESSFULLY_CODE, "Задач пока нет");
                 } else {
-                    sendText(httpExchange, SUCCESSFULLY_CODE, getGson().toJson(tasks));
+                    sendText(httpExchange, SUCCESSFULLY_CODE, HttpTaskServer.getGson().toJson(tasks));
                 }
             }
             case GET_TASK_BY_ID -> {
                 try {
                     Task task = getManager().getTaskById(getIdFromPath(httpExchange));
-                    sendText(httpExchange, SUCCESSFULLY_CODE, getGson().toJson(task));
+                    sendText(httpExchange, SUCCESSFULLY_CODE, HttpTaskServer.getGson().toJson(task));
                 } catch (NonExistingTaskException e) {
                     sendNotFound(httpExchange, e);
                 }
             }
             case DELETE_TASK_BY_ID -> {
                 getManager().deleteTaskById(getIdFromPath(httpExchange));
-                sendText(httpExchange, SUCCESSFULLY_CODE, getGson().toJson("Задача удалена"));
+                sendText(httpExchange, SUCCESSFULLY_CODE, HttpTaskServer.getGson().toJson("Задача удалена"));
             }
             case POST_CREATE_TASK -> {
                 try {
                     String jsonTask = new String(httpExchange.getRequestBody().readAllBytes());
-                    Task task = getGson().fromJson(jsonTask, Task.class);
+                    Task task = HttpTaskServer.getGson().fromJson(jsonTask, Task.class);
                     getManager().createTask(task);
                     sendText(httpExchange, SUCCESSFULLY_UPD_OR_CREATE_CODE, "Задача создана");
                 } catch (TimeIntersectionException exception) {
@@ -54,7 +54,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
             case POST_UPDATE_TASK -> {
                 try {
                     String jsonTask = new String(httpExchange.getRequestBody().readAllBytes());
-                    Task task = getGson().fromJson(jsonTask, Task.class);
+                    Task task = HttpTaskServer.getGson().fromJson(jsonTask, Task.class);
                     getManager().updateTask(task);
                     sendText(httpExchange, SUCCESSFULLY_UPD_OR_CREATE_CODE, "Задача обновлена");
                 } catch (NonExistingTaskException exception) {

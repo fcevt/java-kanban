@@ -1,7 +1,5 @@
 package com.yandex.tracker.httpserver;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.yandex.tracker.model.Task;
 import com.yandex.tracker.model.TaskStatus;
 import com.yandex.tracker.servise.InMemoryTaskManager;
@@ -21,11 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class HistoryHandlerTest {
     TaskManager manager = new InMemoryTaskManager();
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = new GsonBuilder()
-            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-            .registerTypeAdapter(Duration.class, new DurationAdapter())
-            .setPrettyPrinting()
-            .create();
 
     @Test
     void returnHistoryTest() throws IOException, InterruptedException {
@@ -45,7 +38,8 @@ public class HistoryHandlerTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
-        assertEquals(manager.getHistory(), gson.fromJson(response.body(), new TaskListTypeToken().getType()));
+        assertEquals(manager.getHistory(), HttpTaskServer.getGson().fromJson(response.body(),
+                new TaskListTypeToken().getType()));
         taskServer.stop();
     }
 }

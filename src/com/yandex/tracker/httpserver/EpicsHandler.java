@@ -27,13 +27,13 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                 if (epics.isEmpty()) {
                     sendText(httpExchange, SUCCESSFULLY_CODE, "Эпиков пока нет");
                 } else {
-                    sendText(httpExchange, SUCCESSFULLY_CODE, getGson().toJson(getManager().getListOfEpics()));
+                    sendText(httpExchange, SUCCESSFULLY_CODE, HttpTaskServer.getGson().toJson(getManager().getListOfEpics()));
                 }
             }
             case GET_EPIC_BY_ID -> {
                 try {
                     Epic epic = getManager().getEpicById(getIdFromPath(httpExchange));
-                    sendText(httpExchange, SUCCESSFULLY_CODE, getGson().toJson(epic));
+                    sendText(httpExchange, SUCCESSFULLY_CODE, HttpTaskServer.getGson().toJson(epic));
                 } catch (NonExistingTaskException e) {
                     sendNotFound(httpExchange, e);
                 }
@@ -45,7 +45,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                    if (subtaskList.isEmpty()) {
                        sendText(httpExchange, SUCCESSFULLY_CODE, "У этого эпика нет подзадач");
                    } else {
-                       sendText(httpExchange, SUCCESSFULLY_CODE, getGson().toJson(subtaskList));
+                       sendText(httpExchange, SUCCESSFULLY_CODE, HttpTaskServer.getGson().toJson(subtaskList));
                    }
                } catch (NonExistingTaskException e) {
                    sendNotFound(httpExchange, e);
@@ -53,11 +53,11 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
             }
             case DELETE_EPIC_BY_ID -> {
                 getManager().deleteEpicById(getIdFromPath(httpExchange));
-                sendText(httpExchange, SUCCESSFULLY_CODE, getGson().toJson("Эпик удален"));
+                sendText(httpExchange, SUCCESSFULLY_CODE, HttpTaskServer.getGson().toJson("Эпик удален"));
             }
             case POST_CREATE_EPIC -> {
                 String jsonEpic = new String(httpExchange.getRequestBody().readAllBytes());
-                Epic epic = getGson().fromJson(jsonEpic, Epic.class);
+                Epic epic = HttpTaskServer.getGson().fromJson(jsonEpic, Epic.class);
                 getManager().createEpic(epic);
                 sendText(httpExchange, SUCCESSFULLY_UPD_OR_CREATE_CODE, "Эпик создан");
             }
